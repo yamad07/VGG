@@ -64,4 +64,4 @@ def train(model, criterion, optimizer, train_loader, epoch, use_cuda):
 
 for epoch in range(start_epoch, end_epoch + 1):
     train(model, criterion, optimizer, train_loader, epoch, args.use_cuda)
-    torch.save(model.state_dict(), 'weights/vgg_weight_v1.pth')
+    torch.save(model.state_dict(), './weights/vgg_weight_v1.pth')
