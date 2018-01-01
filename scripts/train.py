@@ -10,6 +10,8 @@ import torchvision.datasets as dset
 from torchvision import models
 import argparse
 
+from modules.trainer import Trainer
+
 # Parser
 parser = argparse.ArgumentParser(description="VGG model coding by yamad07")
 parser.add_argument("--use_cuda", default=False, help="gpu or cpu")
@@ -21,13 +23,12 @@ lr = 0.001
 momentum = 0.9
 batch_size = 5
 start_epoch = 1
-end_epoch = 20
+end_epoch = 50
 data_root = ''
 
 # Preprocessing
 transforms = transforms.Compose([
         transforms.RandomResizedCrop(224),
-        transforms.RandomHorizontalFlip(),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]
@@ -43,25 +44,6 @@ if args.use_cuda:
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
-
-def train(model, criterion, optimizer, train_loader, epoch, use_cuda):
-    print('Epoch %d' % epoch)
-    model.train()
-    for i, (images, labels) in enumerate(train_loader):
-        if args.use_cuda:
-            images = images.cuda()
-            labels = labels.cuda()
-
-        images = Variable(images)
-        labels = Variable(labels)
-        optimizer.zero_grad()
-
-        pred = model(images)
-        loss = criterion(pred, labels)
-        loss.backward()
-        optimizer.step()
-        print(loss.data[0])
-
-for epoch in range(start_epoch, end_epoch + 1):
-    train(model, criterion, optimizer, train_loader, epoch, args.use_cuda)
-    torch.save(model.state_dict(), './weights/vgg_weight_v1.pth')
+trainer = Trainer(optimizer, criterion, model, 100, train_loader, args.use_cuda)
+trained_model = trainer.run()
+torch.save(trained_model.state_dict(), '../weights/vgg_weight_v1_'+ str(epoch) +'.pth')
