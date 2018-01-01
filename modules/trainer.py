@@ -24,6 +24,7 @@ class Trainer:
                     labels = labels.cuda()
                 inputs = Variable(inputs)
                 labels = Variable(labels)
+                self.optimizer.zero_grad()
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, labels)
                 loss.backward()
