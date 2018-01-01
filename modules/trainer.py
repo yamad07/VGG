@@ -12,13 +12,14 @@ class Trainer:
         self.model = model
         self.epoch = epoch
         self.loader = loader
+        self.use_cuda = use_cuda
 
     def run(self):
         self.losses = []
         for i in range(self.epoch):
             print("Epoch {0}".format(i))
             for i, (inputs, labels) in enumerate(self.loader):
-                if use_cuda:
+                if self.use_cuda:
                     inputs = inputs.cuda()
                     labels = labels.cuda()
                 inputs = Variable(inputs)
