@@ -23,7 +23,7 @@ lr = 0.001
 momentum = 0.9
 batch_size = 5
 start_epoch = 1
-end_epoch = 50
+end_epoch = 1
 data_root = ''
 
 # Preprocessing
@@ -38,12 +38,13 @@ train_loader = torch.utils.data.DataLoader(datasets, batch_size=batch_size, shuf
 
 # Model Setting
 model = models.vgg19(pretrained=True)
-model.add_module("classefier", nn.Linear(1000, num_classes))
+model.fc = nn.Linear(1000, num_classes)
 if args.use_cuda:
     model = model.cuda()
 
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
-trainer = Trainer(optimizer, criterion, model, 100, train_loader, args.use_cuda)
+trainer = Trainer(optimizer, criterion, model, 10, train_loader, args.use_cuda)
 trained_model = trainer.run()
-torch.save(trained_model.state_dict(), '../weights/vgg_weight_v1_'+ str(epoch) +'.pth')
+
+torch.save(trained_model.state_dict(), '../weights/vgg_weight.pth')

@@ -15,9 +15,9 @@ class Trainer:
         self.use_cuda = use_cuda
 
     def run(self):
-        self.losses = []
-        for i in range(self.epoch):
-            print("Epoch {0}".format(i))
+        self.average_losses = []
+        losses = torch.Tensor([0])
+        for e in range(1, self.epoch + 1):
             for i, (inputs, labels) in enumerate(self.loader):
                 if self.use_cuda:
                     inputs = inputs.cuda()
@@ -29,18 +29,18 @@ class Trainer:
                 loss = self.criterion(outputs, labels)
                 loss.backward()
                 self.optimizer.step()
-            print(loss.data)
-            self.losses.append(loss.data)
-            self.save_graph()
+                print('Epoch: {0}/{1} [{2}/{3}] Loss: {4}'.format(e, self.epoch, i, len(self.loader), loss.data[0]))
+                losses.add(loss)
+            average_loss = losses.div(len(self.loader))
+            self.average_losses.append(average_loss.data[0])
+        self.save_graph()
         return self.model
 
     def save_graph(self):
         print(self.losses)
         losses = pd.DataFrame(self.losses)
-        epoch = pd.DataFrame(list(range(1, len(self.losses))))
-        data = pd.concat([epoch, losses])
-        data.columns = ["Epoch", "Loss"]
-        plt.plot(data)
+        plt.plot(losses)
         plt.xlabel(u"Epoch")
         plt.ylabel(u"Loss")
-        plt.save('reslut.jpg')
+        plt.savefig('reslut.jpg')
+
